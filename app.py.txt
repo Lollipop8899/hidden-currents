@@ -1,0 +1,269 @@
+import streamlit as st
+import pandas as pd
+import matplotlib.pyplot as plt
+
+st.set_page_config(page_title="Hidden Currents", page_icon="🌊", layout="wide")
+
+# -----------------------------
+# Sample beach data (MVP)
+# Later you can replace this with API data
+# -----------------------------
+BEACH_DATA = {
+    "Santa Monica": {
+        "tide": "Outgoing",
+        "wave_height_ft": 1.8,
+        "wave_period_s": 11,
+        "wind": "Offshore",
+        "rip_advisory": "Moderate",
+    },
+    "Manhattan Beach": {
+        "tide": "Incoming",
+        "wave_height_ft": 2.4,
+        "wave_period_s": 8,
+        "wind": "Onshore",
+        "rip_advisory": "Low",
+    },
+    "Huntington Beach": {
+        "tide": "Outgoing",
+        "wave_height_ft": 3.1,
+        "wave_period_s": 12,
+        "wind": "Crossshore",
+        "rip_advisory": "High",
+    },
+    "Malibu": {
+        "tide": "Incoming",
+        "wave_height_ft": 1.2,
+        "wave_period_s": 9,
+        "wind": "Offshore",
+        "rip_advisory": "Low",
+    },
+    "Laguna Beach": {
+        "tide": "Outgoing",
+        "wave_height_ft": 2.0,
+        "wave_period_s": 10,
+        "wind": "Offshore",
+        "rip_advisory": "Moderate",
+    },
+}
+
+# -----------------------------
+# Risk engine (rule-based MVP)
+# -----------------------------
+def compute_risk(data: dict):
+    score = 0
+    reasons = []
+    contributions = {
+        "Tide": 0,
+        "Wave": 0,
+        "Wind": 0,
+        "Advisory": 0,
+    }
+
+    # Tide
+    if data["tide"] == "Outgoing":
+        score += 30
+        contributions["Tide"] += 30
+        reasons.append("Outgoing tide increases offshore pull and can strengthen rip current risk.")
+
+    # Wave height + period
+    if data["wave_height_ft"] <= 2.0 and data["wave_period_s"] >= 10:
+        score += 20
+        contributions["Wave"] += 20
+        reasons.append("Relatively small waves with longer periods can create deceptively calm-looking but unstable conditions.")
+    elif data["wave_height_ft"] > 2.5:
+        score += 15
+        contributions["Wave"] += 15
+        reasons.append("Higher wave energy can increase break instability and current risk.")
+
+    # Wind
+    if data["wind"] == "Offshore":
+        score += 15
+        contributions["Wind"] += 15
+        reasons.append("Offshore wind can flatten the surface appearance while dangerous currents remain active.")
+    elif data["wind"] == "Crossshore":
+        score += 10
+        contributions["Wind"] += 10
+        reasons.append("Crossshore wind may contribute to unstable surface behavior and current patterns.")
+
+    # Advisory
+    if data["rip_advisory"] == "High":
+        score += 30
+        contributions["Advisory"] += 30
+        reasons.append("Official advisory indicates elevated rip current danger.")
+    elif data["rip_advisory"] == "Moderate":
+        score += 15
+        contributions["Advisory"] += 15
+        reasons.append("Moderate advisory suggests conditions may become unsafe, especially for beginners.")
+
+    score = min(score, 100)
+
+    if score >= 70:
+        level = "HIGH"
+        summary = "Surface may look calm, but hidden current conditions are elevated."
+        advice = [
+            "Avoid entering the water without lifeguard supervision.",
+            "Not recommended for beginner surfers or children.",
+            "Stay near monitored areas and ask local lifeguards before entering."
+        ]
+    elif score >= 40:
+        level = "MODERATE"
+        summary = "Some conditions may look manageable, but hidden risk factors are present."
+        advice = [
+            "Use caution and check local conditions before entering.",
+            "Beginners should stay in shallow, monitored areas.",
+            "Do not assume calm-looking water is low risk."
+        ]
+    else:
+        level = "LOW"
+        summary = "Current conditions appear relatively safer, but caution is still important."
+        advice = [
+            "Continue checking lifeguard guidance.",
+            "Stay aware of changing tides and surf conditions.",
+            "Unfamiliar beaches may still carry hidden risk."
+        ]
+
+    return score, level, summary, reasons, advice, contributions
+
+
+def risk_color(level: str) -> str:
+    if level == "HIGH":
+        return "#d9534f"
+    if level == "MODERATE":
+        return "#f0ad4e"
+    return "#5cb85c"
+
+
+# -----------------------------
+# Sidebar navigation
+# -----------------------------
+st.sidebar.title("Navigation")
+page = st.sidebar.radio("Go to", ["Home", "Learn", "Saved"])
+
+st.sidebar.markdown("---")
+st.sidebar.caption("Hidden Currents MVP")
+st.sidebar.caption("A beach safety app for calm-looking but dangerous water")
+
+# -----------------------------
+# HOME PAGE
+# -----------------------------
+if page == "Home":
+    st.title("🌊 Hidden Currents")
+    st.subheader("See what the surface hides")
+
+    beach = st.selectbox("Choose a beach", list(BEACH_DATA.keys()))
+    data = BEACH_DATA[beach]
+
+    score, level, summary, reasons, advice, contributions = compute_risk(data)
+
+    # Main risk card
+    col1, col2 = st.columns([2, 1])
+
+    with col1:
+        st.markdown(f"## {beach}")
+        st.markdown(
+            f"""
+            <div style="padding:20px;border-radius:16px;background-color:{risk_color(level)}20;border:1px solid {risk_color(level)};">
+                <h2 style="margin-bottom:0;color:{risk_color(level)};">Risk Level: {level}</h2>
+                <h3 style="margin-top:8px;">Risk Score: {score} / 100</h3>
+                <p style="font-size:18px;"><b>{summary}</b></p>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+    with col2:
+        st.metric("Tide", data["tide"])
+        st.metric("Wave Height", f'{data["wave_height_ft"]} ft')
+        st.metric("Wave Period", f'{data["wave_period_s"]} s')
+        st.metric("Wind", data["wind"])
+        st.metric("Rip Advisory", data["rip_advisory"])
+
+    st.markdown("---")
+
+    # Why risky
+    with st.expander("Why is this risky?"):
+        for reason in reasons:
+            st.write(f"- {reason}")
+
+    # Safety advice
+    st.markdown("### Safety Advice")
+    for item in advice:
+        st.write(f"- {item}")
+
+    st.markdown("---")
+
+    # Visualization
+    st.markdown("### Risk Factor Contribution")
+    factor_df = pd.DataFrame({
+        "Factor": list(contributions.keys()),
+        "Contribution": list(contributions.values())
+    })
+
+    fig, ax = plt.subplots(figsize=(8, 4))
+    ax.bar(factor_df["Factor"], factor_df["Contribution"])
+    ax.set_ylabel("Risk Contribution")
+    ax.set_title("How different factors influence today's risk")
+    st.pyplot(fig)
+
+    st.markdown("---")
+    st.caption("MVP note: this version uses a rule-based model with sample beach data. Later versions can connect to live wave, tide, and weather APIs.")
+
+# -----------------------------
+# LEARN PAGE
+# -----------------------------
+elif page == "Learn":
+    st.title("📘 Learn")
+    st.subheader("Why calm water can still be dangerous")
+
+    st.markdown("### What is a rip current?")
+    st.write(
+        "A rip current is a strong, narrow flow of water moving away from shore. "
+        "It can pull swimmers away from the beach even when the surface looks calm."
+    )
+
+    st.markdown("### Why can calm-looking water be dangerous?")
+    st.write(
+        "- Rip channels often look smoother than surrounding water.\n"
+        "- Fewer breaking waves can mean water is flowing outward.\n"
+        "- Surface appearance does not always reflect underwater movement."
+    )
+
+    st.markdown("### What should I do if caught in a rip current?")
+    st.write(
+        "- Stay calm.\n"
+        "- Do not swim directly against the current.\n"
+        "- Swim parallel to shore.\n"
+        "- Float if needed and signal for help."
+    )
+
+    st.markdown("### Who should be extra careful?")
+    st.write(
+        "- Tourists unfamiliar with local beaches\n"
+        "- Beginner surfers\n"
+        "- Children and families\n"
+        "- Anyone relying only on surface appearance"
+    )
+
+# -----------------------------
+# SAVED PAGE
+# -----------------------------
+elif page == "Saved":
+    st.title("⭐ Saved Beaches")
+    st.subheader("Quick view of saved beach conditions")
+
+    saved = ["Santa Monica", "Manhattan Beach", "Huntington Beach"]
+
+    for beach in saved:
+        data = BEACH_DATA[beach]
+        score, level, summary, reasons, advice, contributions = compute_risk(data)
+
+        st.markdown(
+            f"""
+            <div style="padding:16px;margin-bottom:12px;border-radius:14px;background-color:{risk_color(level)}15;border:1px solid {risk_color(level)};">
+                <h4 style="margin-bottom:4px;">{beach}</h4>
+                <p style="margin:0;"><b>{level}</b> — Score: {score}/100</p>
+                <p style="margin-top:6px;">{summary}</p>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
