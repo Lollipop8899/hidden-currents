@@ -21,6 +21,21 @@ BEACH_COORDS = {
     "Huntington Beach": (33.6595, -117.9988),
     "Malibu": (34.0259, -118.7798),
     "Laguna Beach": (33.5427, -117.7854),
+    "Newport Beach": (33.6017, -117.9298),
+    "Hermosa Beach": (33.8622, -118.3995),
+    "Redondo Beach": (33.8492, -118.3884),
+    "Venice Beach": (33.9850, -118.4695),
+    "Dockweiler Beach": (33.9397, -118.4404),
+    "Zuma Beach": (34.0207, -118.8318),
+    "El Porto": (33.9006, -118.4220),
+    "Seal Beach": (33.7414, -118.1048),
+    "Seal Beach Pier": (33.7387, -118.1049),
+    "Bolsa Chica": (33.6936, -118.0478),
+    "Crystal Cove": (33.5669, -117.8332),
+    "Dana Point": (33.4669, -117.6981),
+    "Salt Creek Beach": (33.4750, -117.7215),
+    "San Clemente Pier": (33.4178, -117.6210),
+    "Trestles": (33.3843, -117.5931),
 }
 
 # -----------------------------
@@ -62,10 +77,115 @@ BEACH_DATA = {
         "wind": "Offshore",
         "rip_advisory": "Moderate",
     },
+    "Newport Beach": {
+        "tide": "Outgoing",
+        "wave_height_ft": 2.7,
+        "wave_period_s": 11,
+        "wind": "Crossshore",
+        "rip_advisory": "High",
+    },
+    "Hermosa Beach": {
+        "tide": "Incoming",
+        "wave_height_ft": 2.1,
+        "wave_period_s": 9,
+        "wind": "Onshore",
+        "rip_advisory": "Moderate",
+    },
+    "Redondo Beach": {
+        "tide": "Outgoing",
+        "wave_height_ft": 1.9,
+        "wave_period_s": 10,
+        "wind": "Offshore",
+        "rip_advisory": "Moderate",
+    },
+    "Venice Beach": {
+        "tide": "Outgoing",
+        "wave_height_ft": 2.2,
+        "wave_period_s": 10,
+        "wind": "Crossshore",
+        "rip_advisory": "Moderate",
+    },
+    "Dockweiler Beach": {
+        "tide": "Outgoing",
+        "wave_height_ft": 2.3,
+        "wave_period_s": 9,
+        "wind": "Onshore",
+        "rip_advisory": "Moderate",
+    },
+    "Zuma Beach": {
+        "tide": "Outgoing",
+        "wave_height_ft": 3.4,
+        "wave_period_s": 12,
+        "wind": "Crossshore",
+        "rip_advisory": "High",
+    },
+    "El Porto": {
+        "tide": "Outgoing",
+        "wave_height_ft": 3.0,
+        "wave_period_s": 11,
+        "wind": "Crossshore",
+        "rip_advisory": "High",
+    },
+    "Seal Beach": {
+        "tide": "Incoming",
+        "wave_height_ft": 1.7,
+        "wave_period_s": 8,
+        "wind": "Onshore",
+        "rip_advisory": "Low",
+    },
+    "Seal Beach Pier": {
+        "tide": "Outgoing",
+        "wave_height_ft": 2.0,
+        "wave_period_s": 10,
+        "wind": "Offshore",
+        "rip_advisory": "Moderate",
+    },
+    "Bolsa Chica": {
+        "tide": "Incoming",
+        "wave_height_ft": 2.0,
+        "wave_period_s": 9,
+        "wind": "Crossshore",
+        "rip_advisory": "Moderate",
+    },
+    "Crystal Cove": {
+        "tide": "Outgoing",
+        "wave_height_ft": 1.8,
+        "wave_period_s": 10,
+        "wind": "Offshore",
+        "rip_advisory": "Moderate",
+    },
+    "Dana Point": {
+        "tide": "Incoming",
+        "wave_height_ft": 1.3,
+        "wave_period_s": 8,
+        "wind": "Onshore",
+        "rip_advisory": "Low",
+    },
+    "Salt Creek Beach": {
+        "tide": "Outgoing",
+        "wave_height_ft": 3.2,
+        "wave_period_s": 11,
+        "wind": "Crossshore",
+        "rip_advisory": "High",
+    },
+    "San Clemente Pier": {
+        "tide": "Outgoing",
+        "wave_height_ft": 2.1,
+        "wave_period_s": 10,
+        "wind": "Offshore",
+        "rip_advisory": "Moderate",
+    },
+    "Trestles": {
+        "tide": "Outgoing",
+        "wave_height_ft": 3.5,
+        "wave_period_s": 12,
+        "wind": "Crossshore",
+        "rip_advisory": "High",
+    },
 }
 
 # -----------------------------
-# LOAD RIP CURRENT HISTORY DATASET
+# LOAD HISTORICAL DATASET
 # -----------------------------
 @st.cache_data
 def load_rip_history() -> pd.DataFrame:
@@ -79,11 +199,11 @@ def load_rip_history() -> pd.DataFrame:
         }
         missing = required_cols - set(df.columns)
         if missing:
-            st.warning(f"rip_current_history.csv is missing columns: {missing}. Using defaults.")
+            st.warning(f"rip_current_history.csv is missing columns: {missing}. Historical layer disabled.")
             return pd.DataFrame()
         return df
     except FileNotFoundError:
-        st.warning("rip_current_history.csv not found. Historical risk adjustments disabled.")
+        st.warning("rip_current_history.csv not found. Historical layer disabled.")
         return pd.DataFrame()
 
 RIP_HISTORY_DF = load_rip_history()
@@ -124,7 +244,7 @@ def extract_hour(hour: dict) -> dict:
         "wave_height_ft": wave_height_ft,
         "wave_period_s": wave_period_s,
         "wind": classify_wind(wind_speed),
-        "tide": "Outgoing",  # placeholder until a tide API is added
+        "tide": "Outgoing",  # placeholder until tide API is added
         "rip_advisory": advisory_from_wave(wave_height_ft),
     }
 
@@ -144,9 +264,35 @@ def get_real_and_predicted_data(lat: float, lng: float):
         raise ValueError("No hourly data returned from API")
 
     current_data = extract_hour(hours[0])
-    predicted_data = extract_hour(hours[min(3, len(hours) - 1)])  # about 3 hours later
+    predicted_data = extract_hour(hours[min(3, len(hours) - 1)])
 
     return current_data, predicted_data
+
+# -----------------------------
+# RISK HELPERS
+# -----------------------------
+def historical_score_from_label(label: str) -> int:
+    mapping = {
+        "Low": 30,
+        "Moderate": 55,
+        "High": 80,
+        "Unknown": 40,
+    }
+    return mapping.get(label, 40)
+
+def risk_color(level: str) -> str:
+    if level == "HIGH":
+        return "#d9534f"
+    if level == "MODERATE":
+        return "#f0ad4e"
+    return "#5cb85c"
+
+def risk_rgb(level: str):
+    if level == "HIGH":
+        return [217, 83, 79]
+    if level == "MODERATE":
+        return [240, 173, 78]
+    return [92, 184, 92]
 
 # -----------------------------
 # RISK ENGINE
@@ -199,32 +345,27 @@ def compute_risk(data: dict, user_mode: str, beach: str):
         contributions["Advisory"] += 15
         reasons.append("Moderate conditions may become unsafe, especially for beginners.")
 
-    # Historical rip-current dataset adjustment
+    # Historical adjustment
     history_row = get_history_row(beach)
     history_note = None
     historical_risk = "Unknown"
 
     if history_row is not None:
-        
-    multiplier = float(history_row["risk_multiplier"])
-    historical_risk = str(history_row["historical_risk"])
-    history_note = str(history_row["last_incident_note"])
+        multiplier = float(history_row["risk_multiplier"])
+        historical_risk = str(history_row["historical_risk"])
+        history_note = str(history_row["last_incident_note"])
 
-    # smarter adjustment: partial influence, not full rescale
-    baseline_adjustment = int(round((score * (multiplier - 1.0)) * 0.6))
+        baseline_adjustment = int(round((score * (multiplier - 1.0)) * 0.6))
 
-    # extra fixed bump for historically high-risk beaches
-    if historical_risk == "High":
-        baseline_adjustment += 5
-    elif historical_risk == "Moderate":
-        baseline_adjustment += 2
+        if historical_risk == "High":
+            baseline_adjustment += 5
+        elif historical_risk == "Moderate":
+            baseline_adjustment += 2
 
-    if baseline_adjustment > 0:
-        score += baseline_adjustment
-        contributions["History"] += baseline_adjustment
-        reasons.append(
-            f"Historical beach data suggests elevated baseline risk at {beach}."
-        )
+        if baseline_adjustment > 0:
+            score += baseline_adjustment
+            contributions["History"] += baseline_adjustment
+            reasons.append(f"Historical beach data suggests elevated baseline risk at {beach}.")
 
     # User mode adjustment
     if user_mode == "Tourist/Beginner":
@@ -246,8 +387,8 @@ def compute_risk(data: dict, user_mode: str, beach: str):
         else:
             advice = [
                 "Use extreme caution and stay near lifeguard-monitored areas.",
-                "Do not assume calm-looking water reflects safe subsurface conditions.",
                 "Reassess entry points before entering the water.",
+                "Do not rely on surface calm alone.",
             ]
     elif score >= 40:
         level = "MODERATE"
@@ -261,8 +402,8 @@ def compute_risk(data: dict, user_mode: str, beach: str):
         else:
             advice = [
                 "Use caution and monitor changing conditions.",
-                "Evaluate break patterns and currents before entering.",
-                "Do not rely on surface calm alone.",
+                "Evaluate break patterns and current behavior before entering.",
+                "Stay alert for shifting water conditions.",
             ]
     else:
         level = "LOW"
@@ -276,25 +417,11 @@ def compute_risk(data: dict, user_mode: str, beach: str):
         else:
             advice = [
                 "Conditions appear manageable, but continue monitoring the water.",
-                "Stay aware of shifting tides and changing surf.",
+                "Stay aware of shifting tides and surf conditions.",
                 "Use local knowledge when possible.",
             ]
 
     return score, level, summary, reasons, advice, contributions, historical_risk, history_note
-
-def risk_color(level: str) -> str:
-    if level == "HIGH":
-        return "#d9534f"
-    if level == "MODERATE":
-        return "#f0ad4e"
-    return "#5cb85c"
-
-def risk_rgb(level: str):
-    if level == "HIGH":
-        return [217, 83, 79]
-    if level == "MODERATE":
-        return [240, 173, 78]
-    return [92, 184, 92]
 
 # -----------------------------
 # MAP DATA
@@ -304,15 +431,23 @@ def get_all_beach_risks(user_mode: str) -> pd.DataFrame:
 
     for beach, (lat, lng) in BEACH_COORDS.items():
         try:
-            current_data, predicted_data = get_real_and_predicted_data(lat, lng)
-            using_live = True
+            current_data, _ = get_real_and_predicted_data(lat, lng)
+            source = "Live API"
         except Exception:
             current_data = BEACH_DATA[beach]
-            using_live = False
+            source = "Fallback"
 
         score, level, summary, reasons, advice, contributions, historical_risk, history_note = compute_risk(
             current_data, user_mode, beach
         )
+
+        historical_score = historical_score_from_label(historical_risk)
+        if score > historical_score:
+            comparison = "Above baseline"
+        elif score < historical_score:
+            comparison = "Below baseline"
+        else:
+            comparison = "Near baseline"
 
         rows.append({
             "beach": beach,
@@ -321,7 +456,9 @@ def get_all_beach_risks(user_mode: str) -> pd.DataFrame:
             "score": score,
             "level": level,
             "historical_risk": historical_risk,
-            "source": "Live API" if using_live else "Fallback",
+            "historical_score": historical_score,
+            "comparison": comparison,
+            "source": source,
             "color": risk_rgb(level),
         })
 
@@ -456,6 +593,30 @@ if page == "Home":
     st.pyplot(fig)
 
     st.markdown("---")
+    st.markdown("### Live vs Historical Risk Comparison")
+
+    historical_score = historical_score_from_label(historical_risk)
+
+    compare_df = pd.DataFrame({
+        "Risk Type": ["Live Risk", "Predicted Risk", "Historical Baseline"],
+        "Score": [score, pred_score, historical_score]
+    })
+
+    fig2, ax2 = plt.subplots(figsize=(8, 4))
+    ax2.bar(compare_df["Risk Type"], compare_df["Score"])
+    ax2.set_ylim(0, 100)
+    ax2.set_ylabel("Risk Score")
+    ax2.set_title("Comparing Current, Predicted, and Historical Risk")
+    st.pyplot(fig2)
+
+    if score > historical_score:
+        st.info("Current conditions are more dangerous than this beach's usual historical baseline.")
+    elif score < historical_score:
+        st.info("Current conditions are lower than this beach's historical baseline risk.")
+    else:
+        st.info("Current conditions are close to this beach's historical baseline risk.")
+
+    st.markdown("---")
     st.markdown("## Beach Risk Map")
 
     map_df = get_all_beach_risks(user_mode)
@@ -478,12 +639,18 @@ if page == "Home":
     deck = pdk.Deck(
         layers=[layer],
         initial_view_state=view_state,
-        tooltip={"text": "{beach}\nRisk: {level}\nScore: {score}\nHistorical: {historical_risk}\nSource: {source}"}
+        tooltip={
+            "text": "{beach}\nRisk: {level}\nScore: {score}\nHistorical: {historical_risk}\nComparison: {comparison}\nSource: {source}"
+        }
     )
 
     st.pydeck_chart(deck)
+
     st.markdown("### Nearby Beach Risk Summary")
-    st.dataframe(map_df[["beach", "level", "score", "historical_risk", "source"]], use_container_width=True)
+    st.dataframe(
+        map_df[["beach", "level", "score", "historical_risk", "comparison", "source"]],
+        use_container_width=True
+    )
 
 # -----------------------------
 # LEARN PAGE
@@ -501,7 +668,7 @@ elif page == "Learn":
     st.markdown("## ⚠️ Why calm water can be dangerous")
     st.write("""
     - Smooth-looking water may hide rip channels  
-    - Fewer breaking waves does not always mean safer conditions  
+    - Fewer breaking waves do not always mean safer conditions  
     - Surface appearance does not always reflect underwater movement  
     - Unfamiliar beaches are often misread by visitors and beginners  
     """)
@@ -529,10 +696,10 @@ elif page == "Saved":
     st.title("⭐ Saved Beaches")
     st.subheader("Quick view of saved beach conditions")
 
-    saved = ["Santa Monica", "Manhattan Beach", "Huntington Beach"]
+    saved = ["Santa Monica", "Manhattan Beach", "Huntington Beach", "Zuma Beach"]
 
     for beach in saved:
-        data = BEACH_DATA[beach]
+        data = BEACH_DATA.get(beach, list(BEACH_DATA.values())[0])
         score, level, summary, reasons, advice, contributions, historical_risk, history_note = compute_risk(
             data, user_mode, beach
         )
