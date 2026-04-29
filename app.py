@@ -158,7 +158,6 @@ if page == "Home":
         using_live_data = False
 
     score, level, summary, reasons, advice, contributions = compute_risk(data)
-
     color = risk_color(level)
 
     if using_live_data:
@@ -214,9 +213,6 @@ if page == "Home":
     ax.set_title("How different factors influence today's risk")
     st.pyplot(fig)
 
-    st.markdown("---")
-    st.caption("MVP version using rule-based model + live API data")
-
 # -----------------------------
 # LEARN PAGE
 # -----------------------------
@@ -260,8 +256,7 @@ elif page == "Saved":
     saved = ["Santa Monica", "Manhattan Beach", "Huntington Beach"]
 
     for beach in saved:
-       lat, lng = BEACH_COORDS[beach]
-    data = get_real_data(lat, lng)
+        data = BEACH_DATA[beach]
         score, level, summary, reasons, advice, contributions = compute_risk(data)
 
         st.markdown(
