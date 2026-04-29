@@ -160,7 +160,7 @@ except:
 score, level, summary, reasons, advice, contributions = compute_risk(data)
 
     # Main risk card
-    color = risk_color(level)
+color = risk_color(level)
 
     st.markdown(f"""
     <div style="
