@@ -147,8 +147,12 @@ st.sidebar.caption("A beach safety app for calm-looking but dangerous water")
 # HOME PAGE
 # -----------------------------
 if page == "Home":
-    st.title("🌊 Hidden Currents")
-    st.subheader("See what the surface hides")
+    st.markdown("""
+    <h1 style='text-align: center;'>🌊 Hidden Currents</h1>
+    <p style='text-align: center; font-size:18px; color:gray;'>
+    See what the surface hides
+    </p>
+""", unsafe_allow_html=True)
 
     beach = st.selectbox("Choose a beach", list(BEACH_DATA.keys()))
     data = BEACH_DATA[beach]
@@ -156,27 +160,33 @@ if page == "Home":
     score, level, summary, reasons, advice, contributions = compute_risk(data)
 
     # Main risk card
-    col1, col2 = st.columns([2, 1])
+    color = risk_color(level)
 
-    with col1:
-        st.markdown(f"## {beach}")
-        st.markdown(
-            f"""
-            <div style="padding:20px;border-radius:16px;background-color:{risk_color(level)}20;border:1px solid {risk_color(level)};">
-                <h2 style="margin-bottom:0;color:{risk_color(level)};">Risk Level: {level}</h2>
-                <h3 style="margin-top:8px;">Risk Score: {score} / 100</h3>
-                <p style="font-size:18px;"><b>{summary}</b></p>
-            </div>
-            """,
-            unsafe_allow_html=True
+st.markdown(f"""
+<div style="
+    padding:25px;
+    border-radius:20px;
+    background: linear-gradient(135deg, {color}20, white);
+    border: 1px solid {color};
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+">
+    <h2 style="color:{color}; margin-bottom:5px;">{beach}</h2>
+    <h1 style="color:{color}; margin:0;">{level}</h1>
+    <h3>Risk Score: {score}/100</h3>
+    <p style="font-size:18px;"><b>{summary}</b></p>
+</div>
+""", unsafe_allow_html=True)
         )
 
-    with col2:
-        st.metric("Tide", data["tide"])
-        st.metric("Wave Height", f'{data["wave_height_ft"]} ft')
-        st.metric("Wave Period", f'{data["wave_period_s"]} s')
-        st.metric("Wind", data["wind"])
-        st.metric("Rip Advisory", data["rip_advisory"])
+    st.markdown("### Conditions")
+
+st.markdown(f"""
+- 🌊 Tide: **{data['tide']}**
+- 🌊 Wave Height: **{data['wave_height_ft']} ft**
+- 🌊 Period: **{data['wave_period_s']} s**
+- 🌬 Wind: **{data['wind']}**
+- ⚠️ Advisory: **{data['rip_advisory']}**
+""")
 
     st.markdown("---")
 
@@ -186,9 +196,10 @@ if page == "Home":
             st.write(f"- {reason}")
 
     # Safety advice
-    st.markdown("### Safety Advice")
-    for item in advice:
-        st.write(f"- {item}")
+    st.markdown("### 🚨 Safety Guidance")
+
+for item in advice:
+    st.error(item)
 
     st.markdown("---")
 
@@ -215,26 +226,31 @@ elif page == "Learn":
     st.title("📘 Learn")
     st.subheader("Why calm water can still be dangerous")
 
-    st.markdown("### What is a rip current?")
-    st.write(
-        "A rip current is a strong, narrow flow of water moving away from shore. "
-        "It can pull swimmers away from the beach even when the surface looks calm."
-    )
+    st.markdown("## 🌊 What is a rip current?")
+    st.info("A rip current is a strong, narrow flow of water moving away from shore. It can pull swimmers away even when the surface looks calm.")
 
-    st.markdown("### Why can calm-looking water be dangerous?")
-    st.write(
-        "- Rip channels often look smoother than surrounding water.\n"
-        "- Fewer breaking waves can mean water is flowing outward.\n"
-        "- Surface appearance does not always reflect underwater movement."
-    )
+    st.markdown("## ⚠️ Why calm water can be dangerous")
+    st.write("""
+    - Smooth-looking water may hide rip channels  
+    - Fewer waves does NOT mean safer conditions  
+    - The surface does not reflect what’s happening underneath  
+    """)
 
-    st.markdown("### What should I do if caught in a rip current?")
-    st.write(
-        "- Stay calm.\n"
-        "- Do not swim directly against the current.\n"
-        "- Swim parallel to shore.\n"
-        "- Float if needed and signal for help."
-    )
+    st.markdown("## 🧭 What should you do?")
+    st.warning("""
+    - Stay calm  
+    - Do NOT swim directly against the current  
+    - Swim parallel to shore  
+    - Signal for help if needed  
+    """)
+
+    st.markdown("## 👥 Who should be extra careful?")
+    st.write("""
+    - Tourists unfamiliar with the beach  
+    - Beginner surfers  
+    - Children and families  
+    - Anyone relying only on surface appearance  
+    """)
 
     st.markdown("### Who should be extra careful?")
     st.write(
