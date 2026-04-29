@@ -23,10 +23,10 @@ The result is a system that identifies when water may *look safe but behave dang
 
 ## Why this project matters
 
-Rip currents are dangerous not just because they exist—but because they are often misunderstood.
+Rip currents are dangerous not just because they exist, but because they are often misunderstood.
 
 Water that appears calm can still contain strong outgoing currents.  
-Many people—especially tourists and beginners—rely on surface appearance to judge safety.
+Many people, especially tourists and beginners, rely on surface appearance to judge safety.
 
 This project focuses on:
 
