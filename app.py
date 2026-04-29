@@ -152,7 +152,7 @@ if page == "Home":
     <p style='text-align: center; font-size:18px; color:gray;'>
     See what the surface hides
     </p>
-""", unsafe_allow_html=True)
+    """, unsafe_allow_html=True)
 
     beach = st.selectbox("Choose a beach", list(BEACH_DATA.keys()))
     data = BEACH_DATA[beach]
@@ -162,31 +162,29 @@ if page == "Home":
     # Main risk card
     color = risk_color(level)
 
-st.markdown(f"""
-<div style="
-    padding:25px;
-    border-radius:20px;
-    background: linear-gradient(135deg, {color}20, white);
-    border: 1px solid {color};
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-">
-    <h2 style="color:{color}; margin-bottom:5px;">{beach}</h2>
-    <h1 style="color:{color}; margin:0;">{level}</h1>
-    <h3>Risk Score: {score}/100</h3>
-    <p style="font-size:18px;"><b>{summary}</b></p>
-</div>
-""", unsafe_allow_html=True)
-        )
+    st.markdown(f"""
+    <div style="
+        padding:25px;
+        border-radius:20px;
+        background: linear-gradient(135deg, {color}20, white);
+        border: 1px solid {color};
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    ">
+        <h2 style="color:{color}; margin-bottom:5px;">{beach}</h2>
+        <h1 style="color:{color}; margin:0;">{level}</h1>
+        <h3>Risk Score: {score}/100</h3>
+        <p style="font-size:18px;"><b>{summary}</b></p>
+    </div>
+    """, unsafe_allow_html=True)
 
     st.markdown("### Conditions")
-
-st.markdown(f"""
-- 🌊 Tide: **{data['tide']}**
-- 🌊 Wave Height: **{data['wave_height_ft']} ft**
-- 🌊 Period: **{data['wave_period_s']} s**
-- 🌬 Wind: **{data['wind']}**
-- ⚠️ Advisory: **{data['rip_advisory']}**
-""")
+    st.markdown(f"""
+    - 🌊 Tide: **{data['tide']}**
+    - 🌊 Wave Height: **{data['wave_height_ft']} ft**
+    - 🌊 Period: **{data['wave_period_s']} s**
+    - 🌬 Wind: **{data['wind']}**
+    - ⚠️ Advisory: **{data['rip_advisory']}**
+    """)
 
     st.markdown("---")
 
@@ -197,9 +195,8 @@ st.markdown(f"""
 
     # Safety advice
     st.markdown("### 🚨 Safety Guidance")
-
-for item in advice:
-    st.error(item)
+    for item in advice:
+        st.error(item)
 
     st.markdown("---")
 
