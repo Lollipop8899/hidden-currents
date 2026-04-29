@@ -147,10 +147,17 @@ if page == "Home":
     """, unsafe_allow_html=True)
 
     beach = st.selectbox("Choose a beach", list(BEACH_DATA.keys()))
-    lat, lng = BEACH_COORDS[beach]
-    data = get_real_data(lat, lng)
 
-    score, level, summary, reasons, advice, contributions = compute_risk(data)
+    lat, lng = BEACH_COORDS[beach]
+
+try:
+    data = get_real_data(lat, lng)
+    using_live_data = True
+except:
+    data = BEACH_DATA[beach]
+    using_live_data = False
+
+score, level, summary, reasons, advice, contributions = compute_risk(data)
 
     # Main risk card
     color = risk_color(level)
