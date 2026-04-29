@@ -227,13 +227,13 @@ elif page == "Learn":
     st.subheader("Why calm water can still be dangerous")
 
     st.markdown("## 🌊 What is a rip current?")
-    st.info("A rip current is a strong, narrow flow of water moving away from shore. It can pull swimmers away even when the surface looks calm.")
+    st.info("A rip current is a strong, narrow flow of water moving away from shore.")
 
     st.markdown("## ⚠️ Why calm water can be dangerous")
     st.write("""
     - Smooth-looking water may hide rip channels  
     - Fewer waves does NOT mean safer conditions  
-    - The surface does not reflect what’s happening underneath  
+    - Surface ≠ system  
     """)
 
     st.markdown("## 🧭 What should you do?")
