@@ -203,18 +203,27 @@ def compute_risk(data: dict, user_mode: str, beach: str):
     history_row = get_history_row(beach)
     history_note = None
     historical_risk = "Unknown"
-    if history_row is not None:
-        multiplier = float(history_row["risk_multiplier"])
-        historical_risk = str(history_row["historical_risk"])
-        history_note = str(history_row["last_incident_note"])
 
-        history_add = int(round((score * (multiplier - 1.0))))
-        if history_add > 0:
-            score += history_add
-            contributions["History"] += history_add
-            reasons.append(
-                f"Historical dataset indicates elevated baseline risk for {beach} ({historical_risk.lower()} historical risk)."
-            )
+    if history_row is not None:
+    multiplier = float(history_row["risk_multiplier"])
+    historical_risk = str(history_row["historical_risk"])
+    history_note = str(history_row["last_incident_note"])
+
+    # smarter adjustment: partial influence, not full rescale
+    baseline_adjustment = int(round((score * (multiplier - 1.0)) * 0.6))
+
+    # extra fixed bump for historically high-risk beaches
+    if historical_risk == "High":
+        baseline_adjustment += 5
+    elif historical_risk == "Moderate":
+        baseline_adjustment += 2
+
+    if baseline_adjustment > 0:
+        score += baseline_adjustment
+        contributions["History"] += baseline_adjustment
+        reasons.append(
+            f"Historical beach data suggests elevated baseline risk at {beach}."
+        )
 
     # User mode adjustment
     if user_mode == "Tourist/Beginner":
