@@ -252,14 +252,6 @@ elif page == "Learn":
     - Anyone relying only on surface appearance  
     """)
 
-    st.markdown("### Who should be extra careful?")
-    st.write(
-        "- Tourists unfamiliar with local beaches\n"
-        "- Beginner surfers\n"
-        "- Children and families\n"
-        "- Anyone relying only on surface appearance"
-    )
-
 # -----------------------------
 # SAVED PAGE
 # -----------------------------
