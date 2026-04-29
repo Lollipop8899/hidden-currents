@@ -150,17 +150,21 @@ if page == "Home":
 
     lat, lng = BEACH_COORDS[beach]
 
-try:
-    data = get_real_data(lat, lng)
-    using_live_data = True
-except:
-    data = BEACH_DATA[beach]
-    using_live_data = False
+    try:
+        data = get_real_data(lat, lng)
+        using_live_data = True
+    except:
+        data = BEACH_DATA[beach]
+        using_live_data = False
 
-score, level, summary, reasons, advice, contributions = compute_risk(data)
+    score, level, summary, reasons, advice, contributions = compute_risk(data)
 
-    # Main risk card
-color = risk_color(level)
+    color = risk_color(level)
+
+    if using_live_data:
+        st.success("🟢 Live Data Connected")
+    else:
+        st.warning("🟡 Using Sample Data")
 
     st.markdown(f"""
     <div style="
@@ -188,19 +192,16 @@ color = risk_color(level)
 
     st.markdown("---")
 
-    # Why risky
     with st.expander("Why is this risky?"):
         for reason in reasons:
             st.write(f"- {reason}")
 
-    # Safety advice
     st.markdown("### 🚨 Safety Guidance")
     for item in advice:
         st.error(item)
 
     st.markdown("---")
 
-    # Visualization
     st.markdown("### Risk Factor Contribution")
     factor_df = pd.DataFrame({
         "Factor": list(contributions.keys()),
@@ -214,7 +215,7 @@ color = risk_color(level)
     st.pyplot(fig)
 
     st.markdown("---")
-    st.caption("MVP note: this version uses a rule-based model with sample beach data. Later versions can connect to live wave, tide, and weather APIs.")
+    st.caption("MVP version using rule-based model + live API data")
 
 # -----------------------------
 # LEARN PAGE
