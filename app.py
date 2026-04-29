@@ -205,6 +205,7 @@ def compute_risk(data: dict, user_mode: str, beach: str):
     historical_risk = "Unknown"
 
     if history_row is not None:
+        
     multiplier = float(history_row["risk_multiplier"])
     historical_risk = str(history_row["historical_risk"])
     history_note = str(history_row["last_incident_note"])
