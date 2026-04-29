@@ -30,42 +30,12 @@ st.set_page_config(page_title="Hidden Currents", page_icon="🌊", layout="wide"
 # Sample beach data (MVP)
 # Later you can replace this with API data
 # -----------------------------
-BEACH_DATA = {
-    "Santa Monica": {
-        "tide": "Outgoing",
-        "wave_height_ft": 1.8,
-        "wave_period_s": 11,
-        "wind": "Offshore",
-        "rip_advisory": "Moderate",
-    },
-    "Manhattan Beach": {
-        "tide": "Incoming",
-        "wave_height_ft": 2.4,
-        "wave_period_s": 8,
-        "wind": "Onshore",
-        "rip_advisory": "Low",
-    },
-    "Huntington Beach": {
-        "tide": "Outgoing",
-        "wave_height_ft": 3.1,
-        "wave_period_s": 12,
-        "wind": "Crossshore",
-        "rip_advisory": "High",
-    },
-    "Malibu": {
-        "tide": "Incoming",
-        "wave_height_ft": 1.2,
-        "wave_period_s": 9,
-        "wind": "Offshore",
-        "rip_advisory": "Low",
-    },
-    "Laguna Beach": {
-        "tide": "Outgoing",
-        "wave_height_ft": 2.0,
-        "wave_period_s": 10,
-        "wind": "Offshore",
-        "rip_advisory": "Moderate",
-    },
+BEACH_COORDS = {
+    "Santa Monica": (34.0195, -118.4912),
+    "Manhattan Beach": (33.8847, -118.4109),
+    "Huntington Beach": (33.6595, -117.9988),
+    "Malibu": (34.0259, -118.7798),
+    "Laguna Beach": (33.5427, -117.7854),
 }
 
 # -----------------------------
@@ -282,7 +252,8 @@ elif page == "Saved":
     saved = ["Santa Monica", "Manhattan Beach", "Huntington Beach"]
 
     for beach in saved:
-        data = BEACH_DATA[beach]
+       lat, lng = BEACH_COORDS[beach]
+data = get_real_data(lat, lng)
         score, level, summary, reasons, advice, contributions = compute_risk(data)
 
         st.markdown(
