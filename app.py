@@ -253,7 +253,7 @@ elif page == "Saved":
 
     for beach in saved:
        lat, lng = BEACH_COORDS[beach]
-data = get_real_data(lat, lng)
+    data = get_real_data(lat, lng)
         score, level, summary, reasons, advice, contributions = compute_risk(data)
 
         st.markdown(
