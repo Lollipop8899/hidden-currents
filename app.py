@@ -178,7 +178,7 @@ if page == "Home":
 
     beach = st.selectbox("Choose a beach", list(BEACH_DATA.keys()))
     lat, lng = BEACH_COORDS[beach]
-data = get_real_data(lat, lng)
+    data = get_real_data(lat, lng)
 
     score, level, summary, reasons, advice, contributions = compute_risk(data)
 
