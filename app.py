@@ -1,7 +1,29 @@
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
+import requests
 
+API_KEY = "YOUR_API_KEY_HERE"
+
+def get_real_data(lat, lng):
+    url = f"https://api.stormglass.io/v2/weather/point?lat={lat}&lng={lng}&params=waveHeight,wavePeriod,windSpeed"
+
+    headers = {
+        'Authorization': API_KEY
+    }
+
+    response = requests.get(url, headers=headers)
+    data = response.json()
+
+    current = data['hours'][0]
+
+    return {
+        "wave_height_ft": round(current['waveHeight']['noaa'] * 3.28, 2),
+        "wave_period_s": current['wavePeriod']['noaa'],
+        "wind": "Offshore" if current['windSpeed']['noaa'] < 5 else "Onshore",
+        "tide": "Outgoing",   # placeholder
+        "rip_advisory": "Moderate"  # placeholder
+    }
 st.set_page_config(page_title="Hidden Currents", page_icon="🌊", layout="wide")
 
 # -----------------------------
@@ -155,7 +177,8 @@ if page == "Home":
     """, unsafe_allow_html=True)
 
     beach = st.selectbox("Choose a beach", list(BEACH_DATA.keys()))
-    data = BEACH_DATA[beach]
+    lat, lng = BEACH_COORDS[beach]
+data = get_real_data(lat, lng)
 
     score, level, summary, reasons, advice, contributions = compute_risk(data)
 
@@ -272,3 +295,30 @@ elif page == "Saved":
             """,
             unsafe_allow_html=True
         )
+import requests
+
+API_KEY = "YOUR_API_KEY"
+
+def get_real_data(lat, lng):
+    url = f"https://api.stormglass.io/v2/weather/point?lat={lat}&lng={lng}&params=waveHeight,wavePeriod,windSpeed"
+
+    headers = {
+        'Authorization': API_KEY
+    }
+
+    response = requests.get(url, headers=headers)
+    data = response.json()
+
+    current = data['hours'][0]
+
+    return {
+        "wave_height_ft": round(current['waveHeight']['noaa'] * 3.28, 2),
+        "wave_period_s": current['wavePeriod']['noaa'],
+        "wind": "Offshore" if current['windSpeed']['noaa'] < 5 else "Onshore",
+        "tide": "Outgoing",  # placeholder for now
+        "rip_advisory": "Moderate"  # placeholder
+    }
+    BEACH_COORDS = {
+    "Santa Monica": (34.0195, -118.4912),
+    "Manhattan Beach": (33.8847, -118.4109),
+}
