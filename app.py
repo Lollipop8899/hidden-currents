@@ -502,72 +502,57 @@ if page == "Home":
     color = risk_color(level)
     pred_color = risk_color(pred_level)
 
-    top1, top2 = st.columns([1, 1])
-
-    with top1:
-        if using_live_data:
-            st.success("🟢 Live Data Connected")
-        else:
-            st.warning("🟡 Using Sample Data")
-
-    with top2:
-        st.caption(f"Last updated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-        st.caption(f"Mode: {user_mode}")
-
-    st.markdown("## Risk Overview")
-    st.caption("Compare current conditions with the projected short-term risk trend")
-
     col1, col2 = st.columns(2)
 
     with col1:
-    st.markdown(f"""
-    <div style="
-        padding:22px 24px;
-        border-radius:18px;
-        background-color:#ffffff;
-        border:2px solid {color};
-        box-shadow:0 4px 12px rgba(0,0,0,0.08);
-        min-height:180px;
-    ">
-        <div style="font-size:16px; font-weight:700; color:#111827; margin-bottom:10px;">
-            Live Risk Now
+        st.markdown(f"""
+        <div style="
+            padding:22px 24px;
+            border-radius:18px;
+            background-color:#ffffff;
+            border:2px solid {color};
+            box-shadow:0 4px 12px rgba(0,0,0,0.08);
+            min-height:180px;
+        ">
+            <div style="font-size:16px; font-weight:700; color:#111827; margin-bottom:10px;">
+                Live Risk Now
+            </div>
+            <div style="font-size:34px; font-weight:800; color:{color}; line-height:1.1; margin-bottom:8px;">
+                {level}
+            </div>
+            <div style="font-size:16px; color:#111827; margin-bottom:10px;">
+                <b>Score:</b> {score}/100
+            </div>
+            <div style="font-size:15px; color:#374151; line-height:1.5;">
+                {summary}
+            </div>
         </div>
-        <div style="font-size:34px; font-weight:800; color:{color}; line-height:1.1; margin-bottom:8px;">
-            {level}
-        </div>
-        <div style="font-size:16px; color:#111827; margin-bottom:10px;">
-            <b>Score:</b> {score}/100
-        </div>
-        <div style="font-size:15px; color:#374151; line-height:1.5;">
-            {summary}
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+        """, unsafe_allow_html=True)
 
     with col2:
-    st.markdown(f"""
-    <div style="
-        padding:22px 24px;
-        border-radius:18px;
-        background-color:#ffffff;
-        border:2px solid {pred_color};
-        box-shadow:0 4px 12px rgba(0,0,0,0.08);
-        min-height:180px;
-    ">
-        <div style="font-size:16px; font-weight:700; color:#111827; margin-bottom:10px;">
-            Predicted Risk (3 Hours)
+        st.markdown(f"""
+        <div style="
+            padding:22px 24px;
+            border-radius:18px;
+            background-color:#ffffff;
+            border:2px solid {pred_color};
+            box-shadow:0 4px 12px rgba(0,0,0,0.08);
+            min-height:180px;
+        ">
+            <div style="font-size:16px; font-weight:700; color:#111827; margin-bottom:10px;">
+                Predicted Risk (3 Hours)
+            </div>
+            <div style="font-size:34px; font-weight:800; color:{pred_color}; line-height:1.1; margin-bottom:8px;">
+                {pred_level}
+            </div>
+            <div style="font-size:16px; color:#111827; margin-bottom:10px;">
+                <b>Score:</b> {pred_score}/100
+            </div>
+            <div style="font-size:15px; color:#374151; line-height:1.5;">
+                {pred_summary}
+            </div>
         </div>
-        <div style="font-size:34px; font-weight:800; color:{pred_color}; line-height:1.1; margin-bottom:8px;">
-            {pred_level}
-        </div>
-        <div style="font-size:16px; color:#111827; margin-bottom:10px;">
-            <b>Score:</b> {pred_score}/100
-        </div>
-        <div style="font-size:15px; color:#374151; line-height:1.5;">
-            {pred_summary}
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+        """, unsafe_allow_html=True)
 
     if pred_score > score:
         st.warning("Risk is expected to increase over the next few hours.")
