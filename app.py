@@ -244,7 +244,7 @@ def extract_hour(hour: dict) -> dict:
         "wave_height_ft": wave_height_ft,
         "wave_period_s": wave_period_s,
         "wind": classify_wind(wind_speed),
-        "tide": "Outgoing",
+        "tide": "Outgoing",  # placeholder until tide API is added
         "rip_advisory": advisory_from_wave(wave_height_ft),
     }
 
@@ -519,57 +519,57 @@ if page == "Home":
 
     col1, col2 = st.columns(2)
 
-with col1:
-    st.markdown(f"""
-    <div style="
-        padding:22px 24px;
-        border-radius:18px;
-        background-color:{color}18;
-        border:1px solid {color};
-        box-shadow:0 4px 12px rgba(0,0,0,0.05);
-        min-height:180px;
-        color:#111827;
-    ">
-        <div style="font-size:16px; font-weight:700; color:#111827; margin-bottom:10px;">
-            Live Risk Now
+    with col1:
+        st.markdown(f"""
+        <div style="
+            padding:22px 24px;
+            border-radius:18px;
+            background-color:{color}18;
+            border:1px solid {color};
+            box-shadow:0 4px 12px rgba(0,0,0,0.05);
+            min-height:180px;
+            color:#111827;
+        ">
+            <div style="font-size:16px; font-weight:700; color:#111827; margin-bottom:10px;">
+                Live Risk Now
+            </div>
+            <div style="font-size:34px; font-weight:800; color:{color}; line-height:1.1; margin-bottom:8px;">
+                {level}
+            </div>
+            <div style="font-size:16px; color:#111827; margin-bottom:10px;">
+                <b>Score:</b> {score}/100
+            </div>
+            <div style="font-size:15px; color:#374151; line-height:1.5;">
+                {summary}
+            </div>
         </div>
-        <div style="font-size:34px; font-weight:800; color:{color}; line-height:1.1; margin-bottom:8px;">
-            {level}
-        </div>
-        <div style="font-size:16px; color:#111827; margin-bottom:10px;">
-            <b>Score:</b> {score}/100
-        </div>
-        <div style="font-size:15px; color:#374151; line-height:1.5;">
-            {summary}
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+        """, unsafe_allow_html=True)
 
-with col2:
-    st.markdown(f"""
-    <div style="
-        padding:22px 24px;
-        border-radius:18px;
-        background-color:{pred_color}18;
-        border:1px solid {pred_color};
-        box-shadow:0 4px 12px rgba(0,0,0,0.05);
-        min-height:180px;
-        color:#111827;
-    ">
-        <div style="font-size:16px; font-weight:700; color:#111827; margin-bottom:10px;">
-            Predicted Risk (3 Hours)
+    with col2:
+        st.markdown(f"""
+        <div style="
+            padding:22px 24px;
+            border-radius:18px;
+            background-color:{pred_color}18;
+            border:1px solid {pred_color};
+            box-shadow:0 4px 12px rgba(0,0,0,0.05);
+            min-height:180px;
+            color:#111827;
+        ">
+            <div style="font-size:16px; font-weight:700; color:#111827; margin-bottom:10px;">
+                Predicted Risk (3 Hours)
+            </div>
+            <div style="font-size:34px; font-weight:800; color:{pred_color}; line-height:1.1; margin-bottom:8px;">
+                {pred_level}
+            </div>
+            <div style="font-size:16px; color:#111827; margin-bottom:10px;">
+                <b>Score:</b> {pred_score}/100
+            </div>
+            <div style="font-size:15px; color:#374151; line-height:1.5;">
+                {pred_summary}
+            </div>
         </div>
-        <div style="font-size:34px; font-weight:800; color:{pred_color}; line-height:1.1; margin-bottom:8px;">
-            {pred_level}
-        </div>
-        <div style="font-size:16px; color:#111827; margin-bottom:10px;">
-            <b>Score:</b> {pred_score}/100
-        </div>
-        <div style="font-size:15px; color:#374151; line-height:1.5;">
-            {pred_summary}
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+        """, unsafe_allow_html=True)
 
     if pred_score > score:
         st.warning("Risk is expected to increase over the next few hours.")
@@ -757,25 +757,77 @@ with col2:
     st.markdown("### Nearby Beach Risk Summary")
 
     display_df = map_df[["beach", "level", "score", "historical_risk", "comparison", "source"]].copy()
+    display_df["level"] = display_df["level"].map({
+        "HIGH": "🔴 HIGH",
+        "MODERATE": "🟡 MODERATE",
+        "LOW": "🟢 LOW",
+    })
 
-    def badge_color(value):
-        if value == "HIGH":
-            return "background-color:#fef2f2;color:#b91c1c;font-weight:700;"
-        elif value == "MODERATE":
-            return "background-color:#fffbeb;color:#b45309;font-weight:700;"
-        elif value == "LOW":
-            return "background-color:#f0fdf4;color:#15803d;font-weight:700;"
-        return ""
+    st.dataframe(display_df, use_container_width=True)
 
-    styled_df = (
-        display_df.style
-        .applymap(lambda v: badge_color(v) if v in ["HIGH", "MODERATE", "LOW"] else "", subset=["level"])
-        .set_properties(**{
-            "text-align": "left",
-            "padding": "8px",
-            "border-color": "#e5e7eb"
-        })
+# -----------------------------
+# LEARN PAGE
+# -----------------------------
+elif page == "Learn":
+    st.title("📘 Learn")
+    st.subheader("Why calm water can still be dangerous")
+
+    st.markdown("## 🌊 What is a rip current?")
+    st.info(
+        "A rip current is a strong, narrow flow of water moving away from shore. "
+        "It can pull swimmers away even when the surface looks calm."
     )
+
+    st.markdown("## ⚠️ Why calm water can be dangerous")
+    st.write("""
+    - Smooth-looking water may hide rip channels  
+    - Fewer breaking waves do not always mean safer conditions  
+    - Surface appearance does not always reflect underwater movement  
+    - Unfamiliar beaches are often misread by visitors and beginners  
+    """)
+
+    st.markdown("## 🧭 What should you do?")
+    st.warning("""
+    - Stay calm  
+    - Do not swim directly against the current  
+    - Swim parallel to shore  
+    - Float if needed and signal for help  
+    """)
+
+    st.markdown("## 👥 Who should be extra careful?")
+    st.write("""
+    - Tourists unfamiliar with the beach  
+    - Beginner surfers  
+    - Children and families  
+    - Anyone relying only on surface appearance  
+    """)
+
+# -----------------------------
+# SAVED PAGE
+# -----------------------------
+elif page == "Saved":
+    st.title("⭐ Saved Beaches")
+    st.subheader("Quick view of saved beach conditions")
+
+    saved = ["Santa Monica", "Manhattan Beach", "Huntington Beach", "Zuma Beach"]
+
+    for beach in saved:
+        data = BEACH_DATA.get(beach, list(BEACH_DATA.values())[0])
+        score, level, summary, reasons, advice, contributions, historical_risk, history_note = compute_risk(
+            data, user_mode, beach
+        )
+
+        st.markdown(
+            f"""
+            <div style="padding:16px;margin-bottom:12px;border-radius:14px;background-color:{risk_color(level)}15;border:1px solid {risk_color(level)};">
+                <h4 style="margin-bottom:4px;">{beach}</h4>
+                <p style="margin:0;"><b>{level}</b> — Score: {score}/100</p>
+                <p style="margin-top:6px;">{summary}</p>
+                <p style="margin-top:6px;">Historical Risk: {historical_risk}</p>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
 
     st.dataframe(styled_df, use_container_width=True)
 
