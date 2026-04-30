@@ -555,20 +555,18 @@ if page == "Home":
     else:
         st.info("Risk is expected to remain relatively stable over the next few hours.")
 
-    st.markdown("### Conditions")
-    st.markdown(f"""
-    - 🌊 Tide: **{current_data['tide']}**
-    - 🌊 Wave Height: **{current_data['wave_height_ft']} ft**
-    - 🌊 Period: **{current_data['wave_period_s']} s**
-    - 🌬 Wind: **{current_data['wind']}**
-    - ⚠️ Advisory: **{current_data['rip_advisory']}**
-    - 📚 Historical Risk: **{historical_risk}**
-    """)
+st.markdown("### Conditions")
+st.markdown(f"""
+- 🌊 Tide: **{current_data['tide']}**
+- 🌊 Wave Height: **{current_data['wave_height_ft']} ft**
+- 🌊 Period: **{current_data['wave_period_s']} s**
+- 🌬 Wind: **{current_data['wind']}**
+- ⚠️ Advisory: **{current_data['rip_advisory']}**
+- 📚 Historical Risk: **{historical_risk}**
+""")
 
-    if history_note:
-        st.markdown(f"**Historical Note:** {history_note}")
-
-    st.markdown("---")
+if history_note:
+    st.caption(f"Historical note: {history_note}")
 
     with st.expander("Why is this risky?"):
         for reason in reasons:
