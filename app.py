@@ -555,7 +555,8 @@ if page == "Home":
     else:
         st.info("Risk is expected to remain relatively stable over the next few hours.")
 
-    st.markdown("### Conditions")
+    st.markdown("## Conditions Overview")
+    st.caption("Live environmental signals and longer-term beach risk context")
 
 cond1, cond2 = st.columns(2)
 
