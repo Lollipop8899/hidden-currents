@@ -244,7 +244,7 @@ def extract_hour(hour: dict) -> dict:
         "wave_height_ft": wave_height_ft,
         "wave_period_s": wave_period_s,
         "wind": classify_wind(wind_speed),
-        "tide": "Outgoing",  # placeholder until tide API is added
+        "tide": "Outgoing",
         "rip_advisory": advisory_from_wave(wave_height_ft),
     }
 
@@ -309,13 +309,11 @@ def compute_risk(data: dict, user_mode: str, beach: str):
         "User Mode": 0,
     }
 
-    # Tide
     if data["tide"] == "Outgoing":
         score += 30
         contributions["Tide"] += 30
         reasons.append("Outgoing tide increases offshore pull and can strengthen rip current risk.")
 
-    # Wave height + period
     if data["wave_height_ft"] <= 2.0 and data["wave_period_s"] >= 10:
         score += 20
         contributions["Wave"] += 20
@@ -325,7 +323,6 @@ def compute_risk(data: dict, user_mode: str, beach: str):
         contributions["Wave"] += 15
         reasons.append("Higher wave energy can increase break instability and current risk.")
 
-    # Wind
     if data["wind"] == "Offshore":
         score += 15
         contributions["Wind"] += 15
@@ -335,7 +332,6 @@ def compute_risk(data: dict, user_mode: str, beach: str):
         contributions["Wind"] += 10
         reasons.append("Crossshore wind may contribute to unstable surface behavior and current patterns.")
 
-    # Advisory
     if data["rip_advisory"] == "High":
         score += 30
         contributions["Advisory"] += 30
@@ -345,7 +341,6 @@ def compute_risk(data: dict, user_mode: str, beach: str):
         contributions["Advisory"] += 15
         reasons.append("Moderate conditions may become unsafe, especially for beginners.")
 
-    # Historical adjustment
     history_row = get_history_row(beach)
     history_note = None
     historical_risk = "Unknown"
@@ -367,7 +362,6 @@ def compute_risk(data: dict, user_mode: str, beach: str):
             contributions["History"] += baseline_adjustment
             reasons.append(f"Historical beach data suggests elevated baseline risk at {beach}.")
 
-    # User mode adjustment
     if user_mode == "Tourist/Beginner":
         score += 15
         contributions["User Mode"] += 15
