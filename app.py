@@ -508,43 +508,70 @@ if page == "Home":
     color = risk_color(level)
     pred_color = risk_color(pred_level)
 
-    if using_live_data:
-        st.success("🟢 Live Data Connected")
-    else:
-        st.warning("🟡 Using Sample Data")
+    top1, top2 = st.columns([1, 1])
 
-    st.caption(f"Last updated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    st.caption(f"Mode: {user_mode}")
+    with top1:
+        if using_live_data:
+            st.success("🟢 Live Data Connected")
+        else:
+            st.warning("🟡 Using Sample Data")
+
+    with top2:
+        st.caption(f"Last updated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+        st.caption(f"Mode: {user_mode}")
+
+    st.markdown("## Risk Overview")
+    st.caption("Compare current conditions with the projected short-term risk trend")
 
     col1, col2 = st.columns(2)
 
     with col1:
         st.markdown(f"""
         <div style="
-            padding:20px;
+            padding:22px 24px;
             border-radius:18px;
-            background-color:{color}20;
+            background-color:{color}18;
             border:1px solid {color};
+            box-shadow:0 4px 12px rgba(0,0,0,0.05);
+            min-height:180px;
         ">
-            <h3 style="color:{color}; margin-bottom:8px;">Live Risk Now</h3>
-            <h1 style="color:{color}; margin:0;">{level}</h1>
-            <p><b>Score: {score}/100</b></p>
-            <p>{summary}</p>
+            <div style="font-size:16px; font-weight:700; color:#111827; margin-bottom:10px;">
+                Live Risk Now
+            </div>
+            <div style="font-size:34px; font-weight:800; color:{color}; line-height:1.1; margin-bottom:8px;">
+                {level}
+            </div>
+            <div style="font-size:16px; color:#111827; margin-bottom:10px;">
+                <b>Score:</b> {score}/100
+            </div>
+            <div style="font-size:15px; color:#374151; line-height:1.5;">
+                {summary}
+            </div>
         </div>
         """, unsafe_allow_html=True)
 
     with col2:
         st.markdown(f"""
         <div style="
-            padding:20px;
+            padding:22px 24px;
             border-radius:18px;
-            background-color:{pred_color}20;
+            background-color:{pred_color}18;
             border:1px solid {pred_color};
+            box-shadow:0 4px 12px rgba(0,0,0,0.05);
+            min-height:180px;
         ">
-            <h3 style="color:{pred_color}; margin-bottom:8px;">Predicted Risk (3 Hours)</h3>
-            <h1 style="color:{pred_color}; margin:0;">{pred_level}</h1>
-            <p><b>Score: {pred_score}/100</b></p>
-            <p>{pred_summary}</p>
+            <div style="font-size:16px; font-weight:700; color:#111827; margin-bottom:10px;">
+                Predicted Risk (3 Hours)
+            </div>
+            <div style="font-size:34px; font-weight:800; color:{pred_color}; line-height:1.1; margin-bottom:8px;">
+                {pred_level}
+            </div>
+            <div style="font-size:16px; color:#111827; margin-bottom:10px;">
+                <b>Score:</b> {pred_score}/100
+            </div>
+            <div style="font-size:15px; color:#374151; line-height:1.5;">
+                {pred_summary}
+            </div>
         </div>
         """, unsafe_allow_html=True)
 
@@ -558,75 +585,75 @@ if page == "Home":
     st.markdown("## Conditions Overview")
     st.caption("Live environmental signals and longer-term beach risk context")
 
-cond1, cond2 = st.columns(2)
+    cond1, cond2 = st.columns(2)
 
-with cond1:
-    st.markdown(f"""
-    <div style="
-        padding:18px 20px;
-        border-radius:16px;
-        background-color:#f8f9fa;
-        border:1px solid #e5e7eb;
-        color:#1f2937;
-        box-shadow:0 2px 8px rgba(0,0,0,0.04);
-        min-height:150px;
-    ">
-        <div style="font-size:16px; font-weight:700; color:#111827; margin-bottom:12px;">
-            Ocean Conditions
+    with cond1:
+        st.markdown(f"""
+        <div style="
+            padding:18px 20px;
+            border-radius:16px;
+            background-color:#f8f9fa;
+            border:1px solid #e5e7eb;
+            color:#1f2937;
+            box-shadow:0 2px 8px rgba(0,0,0,0.04);
+            min-height:150px;
+        ">
+            <div style="font-size:16px; font-weight:700; color:#111827; margin-bottom:12px;">
+                Ocean Conditions
+            </div>
+            <div style="margin-bottom:10px; color:#1f2937;">🌊 <b>Tide:</b> {current_data['tide']}</div>
+            <div style="margin-bottom:10px; color:#1f2937;">🌊 <b>Wave Height:</b> {current_data['wave_height_ft']} ft</div>
+            <div style="color:#1f2937;">🌊 <b>Period:</b> {current_data['wave_period_s']} s</div>
         </div>
-        <div style="margin-bottom:10px; color:#1f2937;">🌊 <b>Tide:</b> {current_data['tide']}</div>
-        <div style="margin-bottom:10px; color:#1f2937;">🌊 <b>Wave Height:</b> {current_data['wave_height_ft']} ft</div>
-        <div style="color:#1f2937;">🌊 <b>Period:</b> {current_data['wave_period_s']} s</div>
-    </div>
-    """, unsafe_allow_html=True)
+        """, unsafe_allow_html=True)
 
-with cond2:
-    st.markdown(f"""
-    <div style="
-        padding:18px 20px;
-        border-radius:16px;
-        background-color:#f8f9fa;
-        border:1px solid #e5e7eb;
-        color:#1f2937;
-        box-shadow:0 2px 8px rgba(0,0,0,0.04);
-        min-height:150px;
-    ">
-        <div style="font-size:16px; font-weight:700; color:#111827; margin-bottom:12px;">
-            Risk Context
+    with cond2:
+        st.markdown(f"""
+        <div style="
+            padding:18px 20px;
+            border-radius:16px;
+            background-color:#f8f9fa;
+            border:1px solid #e5e7eb;
+            color:#1f2937;
+            box-shadow:0 2px 8px rgba(0,0,0,0.04);
+            min-height:150px;
+        ">
+            <div style="font-size:16px; font-weight:700; color:#111827; margin-bottom:12px;">
+                Risk Context
+            </div>
+            <div style="margin-bottom:10px; color:#1f2937;">🌬 <b>Wind:</b> {current_data['wind']}</div>
+            <div style="margin-bottom:10px; color:#1f2937;">⚠️ <b>Advisory:</b> {current_data['rip_advisory']}</div>
+            <div style="color:#1f2937;">📚 <b>Historical Risk:</b> {historical_risk}</div>
         </div>
-        <div style="margin-bottom:10px; color:#1f2937;">🌬 <b>Wind:</b> {current_data['wind']}</div>
-        <div style="margin-bottom:10px; color:#1f2937;">⚠️ <b>Advisory:</b> {current_data['rip_advisory']}</div>
-        <div style="color:#1f2937;">📚 <b>Historical Risk:</b> {historical_risk}</div>
-    </div>
-    """, unsafe_allow_html=True)
+        """, unsafe_allow_html=True)
 
-if history_note:
-    st.markdown(f"""
-    <div style="
-        margin-top:12px;
-        padding:14px 16px;
-        border-radius:12px;
-        background-color:#fff8e1;
-        border-left:5px solid #f0ad4e;
-        color:#1f2937;
-        box-shadow:0 2px 8px rgba(0,0,0,0.03);
-    ">
-        <span style="font-weight:700; color:#92400e;">Historical Note:</span>
-        <span style="color:#1f2937;"> {history_note}</span>
-    </div>
-    """, unsafe_allow_html=True)
+    if history_note:
+        st.markdown(f"""
+        <div style="
+            margin-top:12px;
+            padding:14px 16px;
+            border-radius:12px;
+            background-color:#fff8e1;
+            border-left:5px solid #f0ad4e;
+            color:#1f2937;
+            box-shadow:0 2px 8px rgba(0,0,0,0.03);
+        ">
+            <span style="font-weight:700; color:#92400e;">Historical Note:</span>
+            <span style="color:#1f2937;"> {history_note}</span>
+        </div>
+        """, unsafe_allow_html=True)
 
-    with st.expander("Why is this beach historically risky?"):
-        st.write(history_note)
+        with st.expander("Why is this beach historically risky?"):
+            st.write(history_note)
 
-        if historical_risk == "High":
-            st.write("This beach has a stronger long-term hazard profile, so the model applies a more cautious baseline adjustment.")
-        elif historical_risk == "Moderate":
-            st.write("This beach shows recurring risk patterns under certain conditions, so the model adds a moderate baseline adjustment.")
-        elif historical_risk == "Low":
-            st.write("This beach has a relatively lower historical hazard profile, but current conditions can still create danger.")
-        else:
-            st.write("No detailed historical classification is currently available for this beach.")
+            if historical_risk == "High":
+                st.write("This beach has a stronger long-term hazard profile, so the model applies a more cautious baseline adjustment.")
+            elif historical_risk == "Moderate":
+                st.write("This beach shows recurring risk patterns under certain conditions, so the model adds a moderate baseline adjustment.")
+            elif historical_risk == "Low":
+                st.write("This beach has a relatively lower historical hazard profile, but current conditions can still create danger.")
+            else:
+                st.write("No detailed historical classification is currently available for this beach.")
 
     st.markdown("### 🚨 Safety Guidance")
     for item in advice:
@@ -672,6 +699,7 @@ if history_note:
 
     st.markdown("---")
     st.markdown("## Beach Risk Map")
+    st.caption("Color-coded coastal risk across nearby beaches based on current conditions, historical baseline, and user mode")
 
     map_df = get_all_beach_risks(user_mode)
 
@@ -680,8 +708,13 @@ if history_note:
         data=map_df,
         get_position='[lon, lat]',
         get_color='color',
-        get_radius=700,
+        get_radius=900,
         pickable=True,
+        opacity=0.85,
+        stroked=True,
+        filled=True,
+        line_width_min_pixels=1,
+        get_line_color=[255, 255, 255],
     )
 
     view_state = pdk.ViewState(
@@ -694,17 +727,61 @@ if history_note:
         layers=[layer],
         initial_view_state=view_state,
         tooltip={
-            "text": "{beach}\nRisk: {level}\nScore: {score}\nHistorical: {historical_risk}\nComparison: {comparison}\nSource: {source}"
+            "html": """
+            <div style="font-family:Arial; font-size:13px;">
+                <b>{beach}</b><br/>
+                Risk: <b>{level}</b><br/>
+                Score: <b>{score}</b><br/>
+                Historical: <b>{historical_risk}</b><br/>
+                Comparison: <b>{comparison}</b><br/>
+                Source: <b>{source}</b>
+            </div>
+            """
         }
     )
 
     st.pydeck_chart(deck)
 
+    st.markdown("""
+    <div style="
+        display:flex;
+        gap:18px;
+        align-items:center;
+        margin-top:8px;
+        margin-bottom:8px;
+        font-size:14px;
+        color:#374151;
+    ">
+        <div><span style="display:inline-block;width:12px;height:12px;background:#d9534f;border-radius:50%;margin-right:6px;"></span>High Risk</div>
+        <div><span style="display:inline-block;width:12px;height:12px;background:#f0ad4e;border-radius:50%;margin-right:6px;"></span>Moderate Risk</div>
+        <div><span style="display:inline-block;width:12px;height:12px;background:#5cb85c;border-radius:50%;margin-right:6px;"></span>Low Risk</div>
+    </div>
+    """, unsafe_allow_html=True)
+
     st.markdown("### Nearby Beach Risk Summary")
-    st.dataframe(
-        map_df[["beach", "level", "score", "historical_risk", "comparison", "source"]],
-        use_container_width=True
+
+    display_df = map_df[["beach", "level", "score", "historical_risk", "comparison", "source"]].copy()
+
+    def badge_color(value):
+        if value == "HIGH":
+            return "background-color:#fef2f2;color:#b91c1c;font-weight:700;"
+        elif value == "MODERATE":
+            return "background-color:#fffbeb;color:#b45309;font-weight:700;"
+        elif value == "LOW":
+            return "background-color:#f0fdf4;color:#15803d;font-weight:700;"
+        return ""
+
+    styled_df = (
+        display_df.style
+        .applymap(lambda v: badge_color(v) if v in ["HIGH", "MODERATE", "LOW"] else "", subset=["level"])
+        .set_properties(**{
+            "text-align": "left",
+            "padding": "8px",
+            "border-color": "#e5e7eb"
+        })
     )
+
+    st.dataframe(styled_df, use_container_width=True)
 
 # -----------------------------
 # LEARN PAGE
