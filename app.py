@@ -555,62 +555,62 @@ if page == "Home":
     else:
         st.info("Risk is expected to remain relatively stable over the next few hours.")
 
-st.markdown("### Conditions")
+    st.markdown("### Conditions")
 
-cond1, cond2 = st.columns(2)
+    cond1, cond2 = st.columns(2)
 
-with cond1:
-    st.markdown(f"""
-    <div style="
-        padding:16px;
-        border-radius:14px;
-        background-color:#f8f9fa;
-        border:1px solid #e6e6e6;
-    ">
-        <p>🌊 <b>Tide:</b> {current_data['tide']}</p>
-        <p>🌊 <b>Wave Height:</b> {current_data['wave_height_ft']} ft</p>
-        <p>🌊 <b>Period:</b> {current_data['wave_period_s']} s</p>
-    </div>
-    """, unsafe_allow_html=True)
+    with cond1:
+        st.markdown(f"""
+        <div style="
+            padding:16px;
+            border-radius:14px;
+            background-color:#f8f9fa;
+            border:1px solid #e6e6e6;
+        ">
+            <p>🌊 <b>Tide:</b> {current_data['tide']}</p>
+            <p>🌊 <b>Wave Height:</b> {current_data['wave_height_ft']} ft</p>
+            <p>🌊 <b>Period:</b> {current_data['wave_period_s']} s</p>
+        </div>
+        """, unsafe_allow_html=True)
 
-with cond2:
-    st.markdown(f"""
-    <div style="
-        padding:16px;
-        border-radius:14px;
-        background-color:#f8f9fa;
-        border:1px solid #e6e6e6;
-    ">
-        <p>🌬 <b>Wind:</b> {current_data['wind']}</p>
-        <p>⚠️ <b>Advisory:</b> {current_data['rip_advisory']}</p>
-        <p>📚 <b>Historical Risk:</b> {historical_risk}</p>
-    </div>
-    """, unsafe_allow_html=True)
+    with cond2:
+        st.markdown(f"""
+        <div style="
+            padding:16px;
+            border-radius:14px;
+            background-color:#f8f9fa;
+            border:1px solid #e6e6e6;
+        ">
+            <p>🌬 <b>Wind:</b> {current_data['wind']}</p>
+            <p>⚠️ <b>Advisory:</b> {current_data['rip_advisory']}</p>
+            <p>📚 <b>Historical Risk:</b> {historical_risk}</p>
+        </div>
+        """, unsafe_allow_html=True)
 
-if history_note:
-    st.markdown(f"""
-    <div style="
-        margin-top:10px;
-        padding:14px;
-        border-radius:12px;
-        background-color:#fff8e1;
-        border-left:5px solid #f0ad4e;
-    ">
-        <b>Historical Note:</b> {history_note}
-    </div>
-    """, unsafe_allow_html=True)
+    if history_note:
+        st.markdown(f"""
+        <div style="
+            margin-top:10px;
+            padding:14px;
+            border-radius:12px;
+            background-color:#fff8e1;
+            border-left:5px solid #f0ad4e;
+        ">
+            <b>Historical Note:</b> {history_note}
+        </div>
+        """, unsafe_allow_html=True)
 
-    with st.expander("Why is this beach historically risky?"):
-        st.write(history_note)
+        with st.expander("Why is this beach historically risky?"):
+            st.write(history_note)
 
-        if historical_risk == "High":
-            st.write("This beach has a stronger long-term hazard profile, so the model applies a more cautious baseline adjustment.")
-        elif historical_risk == "Moderate":
-            st.write("This beach shows recurring risk patterns under certain conditions, so the model adds a moderate baseline adjustment.")
-        elif historical_risk == "Low":
-            st.write("This beach has a relatively lower historical hazard profile, but current conditions can still create danger.")
-        else:
-            st.write("No detailed historical classification is currently available for this beach.")
+            if historical_risk == "High":
+                st.write("This beach has a stronger long-term hazard profile, so the model applies a more cautious baseline adjustment.")
+            elif historical_risk == "Moderate":
+                st.write("This beach shows recurring risk patterns under certain conditions, so the model adds a moderate baseline adjustment.")
+            elif historical_risk == "Low":
+                st.write("This beach has a relatively lower historical hazard profile, but current conditions can still create danger.")
+            else:
+                st.write("No detailed historical classification is currently available for this beach.")
 
     st.markdown("### 🚨 Safety Guidance")
     for item in advice:
